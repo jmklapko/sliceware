@@ -19,6 +19,8 @@
 MAX6675 CH1(CLK, SS1, DATA);
 MAX6675 CH2(CLK, SS2, DATA);
 
+float tempOffset = 4.0;
+
 typedef union //Define a float that can be broken up and sent via I2C
 {
   float number;
@@ -106,9 +108,9 @@ void loop() {
   if(millis() - lastUpdate >= updateInterval){
     lastUpdate = millis();
     Serial.print("Temp1: ");
-    Serial.print(CH1.readCelsius());
+    Serial.print(CH1.readCelsius() + tempOffset);
     Serial.print(" Temp2: ");
-    Serial.print(CH2.readCelsius());
+    Serial.print(CH2.readCelsius() + tempOffset);
     if(heaterOn)
       Serial.println(" -> ON");
     else
@@ -124,10 +126,10 @@ void requestEvent() {
     case 'T':
       switch (tempSelect) {
         case 1:
-          RX.number = CH1.readCelsius();  // reference a pointer instead
+          RX.number = CH1.readCelsius() + tempOffset;  // reference a pointer instead
           break;
         case 2:
-          RX.number = CH2.readCelsius();
+          RX.number = CH2.readCelsius() + tempOffset;
           break;
         default:
           RX.number = 0;
